@@ -55,6 +55,10 @@ void InitTetris(){
 	score=0;	
 	gameOver=0;
 	timed_out=0;
+	root = malloc(sizeof(RecNode));
+	root->lv=0;
+	tree(root);
+	recommend(root);
 
 	DrawOutline();
 	DrawField();
@@ -339,15 +343,13 @@ void BlockDown(int sig){
 		if (blockY == -1) 
 			gameOver = 1;
 		
-		//AddBlockToField(field, nextBlock[0], blockRotate, blockY, blockX);
+		AddBlockToField(field, nextBlock[0], blockRotate, blockY, blockX);
 		score += DeleteLine(field);
 		nextBlock[0]=nextBlock[1];
 		nextBlock[1]=nextBlock[2];
 		nextBlock[2]=rand()%7;
-		root=(*RecNode)malloc(sizeof(RecNode));
-		recommend(root);
 		DrawNextBlock(nextBlock);
-		
+		recommend(root);
 		blockY = -1;
 		blockX = WIDTH/2-2;
 		blockRotate = 0;
@@ -368,7 +370,7 @@ int AddBlockToField(char f[HEIGHT][WIDTH],int currentBlock,int blockRotate, int 
 		for(j=0; j<4; j++)
 		{
 			if(block[currentBlock][blockRotate][i][j] == 1) 
-			{f[blockY + i][blockX + j] = 1;
+			{field[blockY + i][blockX + j] = 1;
 			if(blockY+i == HEIGHT-1)
 				sc++;
 		}
@@ -744,18 +746,13 @@ void newRank(int score){
 }
 
 void DrawRecommend(int y, int x, int blockID,int blockRotate){
-	
+	// user code
+	R_y=y; R_x=x;
+	R_ID=blockID; R_rotate=blockRotate;
 	DrawBlock(y,x,blockID,blockRotate,'R');
 }
 
 int recommend(RecNode *root){
-	
-	root->lv=0;
-	answernode=root;	
-	tree(root);
-	addtree(root);
-
-/*
 	for(int i=0; i<4; i++){
 		for(int j=0; j<4; j++){
 			if(block[R_ID][R_rotate][i][j]==1&&R_y+i>-1)
@@ -780,7 +777,7 @@ int recommend(RecNode *root){
 	DrawRecommend(answernode->recBlockY,answernode->recBlockX,answernode->curBlockID,answernode->recBlockRotate);
 	max=answernode->score;
 */	
-	return max;*/
+	return max;
 }
 
 void tree(RecNode *node)
@@ -792,7 +789,7 @@ void tree(RecNode *node)
 		node->recBlockY=0;
 		node->recBlockX=0;
 		node->recBlockRotate=0;
-		
+		node->curBlockID=nextBlock[node->lv];
 		for(int i=0; i<HEIGHT; i++)
 		{
 			for(int j=0; j<WIDTH;j++)
@@ -808,11 +805,11 @@ void tree(RecNode *node)
 		int i=0;
 		while(i<CHILDREN_MAX)
 		{
-			node->c[i]=(*RecNode)malloc(sizeof(RecNode));
+			node->c[i]=malloc(sizeof(RecNode));
 			node->c[i]->lv=node->lv+1;
 			node->c[i]->parent=node;
 			node->c[i]->score=0;
-			node->c[i]->curBlockID=nextBlock[node->lv];
+			//node->c[i]->curBlockID=nextBlock[node->lv];
 			tree(node->c[i]);
 			i++;
 		}
@@ -822,24 +819,7 @@ void tree(RecNode *node)
 
 
 void addtree(RecNode*node){
-
-	int index=0;
-	for(int rotate=0; rotate<blocknum[nextBlock[node->lv]]; rotate++)
-	{
-		for(int x=-1; x<WIDTH; x++){
-		for(int a=0; a<HEIGHT; a++){
-			for(int b=0; b<WIDTH; b++){
-				node->c[index]->f[a][b]=node->f[a][b];
-			}
-		}
-		while(y+1
-		node->c[index]->recBlockX;
-		node->c[index]->recBlockY
-
-		
-		}
-	}
-	/*	if(node->lv==0)
+		if(node->lv==0)
 			{
 				for(int i=0; i<HEIGHT; i++)
 			 {
@@ -883,7 +863,7 @@ void addtree(RecNode*node){
 		    }
 			
 			
-	*/
+	
 
 }
 

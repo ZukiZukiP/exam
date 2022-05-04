@@ -15,6 +15,7 @@ RecNode *answernode;
 
 int R_y,R_x,R_ID,R_rotate;
 
+
 int main(){
 	int exit=0;
 
@@ -55,6 +56,10 @@ void InitTetris(){
 	score=0;	
 	gameOver=0;
 	timed_out=0;
+	root = malloc(sizeof(RecNode));
+	root->lv=0;
+	tree(root);
+	recommend(root);
 
 	DrawOutline();
 	DrawField();
@@ -265,24 +270,22 @@ char menu(){
 /////////////////////////첫주차 실습에서 구현해야 할 함수/////////////////////////
 
 int CheckToMove(char f[HEIGHT][WIDTH],int currentBlock,int blockRotate, int blockY, int blockX){
-	int t_i =0, t_j =0;
-	int i,j;
-	for(i=0; i<4; i++) {
+		int t_i =0, t_j =0;
+			int i,j;
+				for(i=0; i<4; i++) {
 		for(j=0; j<4; j++){
-			if(block[currentBlock][blockRotate][i][j] == 1){
-				t_i = blockY + i; t_j = blockX + j;
-				if(!(0<=t_j && t_j<WIDTH && 0<=t_i && t_i < HEIGHT)) // 벗어남
-					return 0;
+				if(block[currentBlock][blockRotate][i][j] == 1){
+					t_i = blockY + i; t_j = blockX + j;
+			if(!(0<=t_j && t_j<WIDTH && 0<=t_i && t_i < HEIGHT)) // 벗어남
+			return 0;
 				if(f[t_i][t_j]==1) // 이미 블록 있음
-					return 0;
-	}
-	}
-	}
-	return 1;
-		
-	// user code
+		return 0;
 }
-
+}
+}
+return 1;
+// user code
+}
 void DrawChange(char f[HEIGHT][WIDTH],int command,int currentBlock,int blockRotate, int blockY, int blockX){
 	// user code
 	int i,j;
@@ -323,6 +326,7 @@ void DrawChange(char f[HEIGHT][WIDTH],int command,int currentBlock,int blockRota
 				}
 			}
 		}
+	recommend(root);
 	DrawBlockWithFeatures(blockY, blockX, currentBlock, blockRotate);//3. 새로운 블록 정보를 그린다. 
 	 move(HEIGHT,WIDTH+10);
 
@@ -339,13 +343,11 @@ void BlockDown(int sig){
 		if (blockY == -1) 
 			gameOver = 1;
 		
-		//AddBlockToField(field, nextBlock[0], blockRotate, blockY, blockX);
+		AddBlockToField(field, nextBlock[0], blockRotate, blockY, blockX);
 		score += DeleteLine(field);
 		nextBlock[0]=nextBlock[1];
 		nextBlock[1]=nextBlock[2];
 		nextBlock[2]=rand()%7;
-		root=(*RecNode)malloc(sizeof(RecNode));
-		recommend(root);
 		DrawNextBlock(nextBlock);
 		
 		blockY = -1;
@@ -402,7 +404,7 @@ int DeleteLine(char f[HEIGHT][WIDTH]){
 		{
 			for(j=0; j<WIDTH; j++)
 			{
-				f[k+1][j] = f[k][j];
+				field[k+1][j] = f[k][j];
 			}
 		}
 		ans++; 
@@ -744,18 +746,13 @@ void newRank(int score){
 }
 
 void DrawRecommend(int y, int x, int blockID,int blockRotate){
-	
+	// user code
+	R_y=y; R_x=x;
+	R_ID=blockID; R_rotate=blockRotate;
 	DrawBlock(y,x,blockID,blockRotate,'R');
 }
 
 int recommend(RecNode *root){
-	
-	root->lv=0;
-	answernode=root;	
-	tree(root);
-	addtree(root);
-
-/*
 	for(int i=0; i<4; i++){
 		for(int j=0; j<4; j++){
 			if(block[R_ID][R_rotate][i][j]==1&&R_y+i>-1)
@@ -780,7 +777,7 @@ int recommend(RecNode *root){
 	DrawRecommend(answernode->recBlockY,answernode->recBlockX,answernode->curBlockID,answernode->recBlockRotate);
 	max=answernode->score;
 */	
-	return max;*/
+	return max;
 }
 
 void tree(RecNode *node)
@@ -792,7 +789,7 @@ void tree(RecNode *node)
 		node->recBlockY=0;
 		node->recBlockX=0;
 		node->recBlockRotate=0;
-		
+		node->curBlockID=nextBlock[node->lv];
 		for(int i=0; i<HEIGHT; i++)
 		{
 			for(int j=0; j<WIDTH;j++)
@@ -808,11 +805,11 @@ void tree(RecNode *node)
 		int i=0;
 		while(i<CHILDREN_MAX)
 		{
-			node->c[i]=(*RecNode)malloc(sizeof(RecNode));
+			node->c[i]=malloc(sizeof(RecNode));
 			node->c[i]->lv=node->lv+1;
 			node->c[i]->parent=node;
 			node->c[i]->score=0;
-			node->c[i]->curBlockID=nextBlock[node->lv];
+			//node->c[i]->curBlockID=nextBlock[node->lv];
 			tree(node->c[i]);
 			i++;
 		}
@@ -822,24 +819,7 @@ void tree(RecNode *node)
 
 
 void addtree(RecNode*node){
-
-	int index=0;
-	for(int rotate=0; rotate<blocknum[nextBlock[node->lv]]; rotate++)
-	{
-		for(int x=-1; x<WIDTH; x++){
-		for(int a=0; a<HEIGHT; a++){
-			for(int b=0; b<WIDTH; b++){
-				node->c[index]->f[a][b]=node->f[a][b];
-			}
-		}
-		while(y+1
-		node->c[index]->recBlockX;
-		node->c[index]->recBlockY
-
-		
-		}
-	}
-	/*	if(node->lv==0)
+		if(node->lv==0)
 			{
 				for(int i=0; i<HEIGHT; i++)
 			 {
@@ -857,7 +837,7 @@ void addtree(RecNode*node){
 				int y=0;
 				for(int x=-1; x<WIDTH; x++){
 					if(CheckToMove(node->f,nextBlock[node->lv],rotate,y,x)==1){
-						for(int a=0; a<HEIGHT; a++)
+			/*			for(int a=0; a<HEIGHT; a++)
 					    {
 							for(int b=0; b<WIDTH; b++)
 							 {
@@ -871,19 +851,19 @@ void addtree(RecNode*node){
 					node->c[i]->recBlockX=x;
 					node->c[i]->recBlockRotate=rotate;
 					node->c[i]->curBlockID=nextBlock[node->c[i]->lv];
-					node->c[i]->score=node->score+AddBlockToField(node->c[i]->f,node->c[i]->curBlockID,node->recBlockRotate,node->c[i]->recBlockY,node->c[i]->recBlockX)+DeleteLine(node->c[i]->f);
+					//node->c[i]->score=node->score+AddBlockToField(node->c[i]->f,node->c[i]->curBlockID,node->recBlockRotate,node->c[i]->recBlockY,node->c[i]->recBlockX)+DeleteLine(node->c[i]->f);
 
 					if(node->c[i]->score>answernode->score)
 					answernode=node->c[i];
 					if(node->c[i]->lv<VISIBLE_BLOCKS)
-					addtree(node->c[i]);
+			*/		//addtree(node->c[i]);
 					i++;
 			
 				}
 		    }
 			
 			
-	*/
+	
 
 }
 
@@ -892,4 +872,3 @@ void recommendedPlay(){
 	// user code
 	clear();
 }
-
